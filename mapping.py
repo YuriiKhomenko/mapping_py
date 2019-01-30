@@ -17,11 +17,21 @@ def get_color(elevation):
 
 map = f.Map(location=[51.11, 17.03])
 
-fg = f.FeatureGroup(name="My Map")
+volcanoes = f.FeatureGroup(name="Volcanoes")
 
 for lt, ln, el, name in zip(lat, lon, elev, names):
-  fg.add_child(f.CircleMarker(location=[lt,ln], radius=6, popup=name, fill_color=get_color(el), color="black", fill_opacity=0.9))
+  volcanoes.add_child(f.CircleMarker(location=[
+                      lt, ln], radius=6, popup=name, fill_color=get_color(el), color="black", fill_opacity=0.9))
 
-map.add_child(fg)
+population = f.FeatureGroup(name="World population")
+
+population.add_child(f.GeoJson(data=open("world.json", "r", encoding="utf-8-sig").read(), style_function=lambda x: {
+    "fillColor": "green" if x["properties"]["POP2005"] < 10e6 else "orange" if 10e6 <= x["properties"]["POP2005"] < 20e6 else "red"}))
+
+map.add_child(volcanoes)
+map.add_child(population)
+
+map.add_child(f.LayerControl())
+
 map.save('Map.html')
  
